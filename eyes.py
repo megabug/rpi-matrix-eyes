@@ -57,8 +57,7 @@ class Sprite:
                     if self.image.getpixel((x, y))[:3] == transparent:
                         self.image.putpixel((x, y), (0, 0, 0, 0))
 
-        self.x = 0
-        self.y = 0
+        self.pos: tuple[int, int] = (0, 0)
 
 
 options = rgbmatrix.RGBMatrixOptions()
@@ -166,15 +165,15 @@ while True:
 
     # Move eye sprites -----------------------------------------------------
 
-    sprites[0].x, sprites[0].y = (
+    sprites[0].pos = (
         int(EYE_CENTER[0] + eye_pos[0] + 0.5),
         int(EYE_CENTER[1] + eye_pos[1] + 0.5),
     )
-    sprites[2].x, sprites[2].y = (
+    sprites[2].pos = (
         int(upper_lid_pos[0] + 0.5),
         int(upper_lid_pos[1] + 0.5),
     )
-    sprites[1].x, sprites[1].y = (
+    sprites[1].pos = (
         int(lower_lid_pos[0] + 0.5),
         int(lower_lid_pos[1] + 0.5),
     )
@@ -182,7 +181,7 @@ while True:
     # Render ---------------------------------------------------------------
 
     for sprite in sprites:
-        stage.alpha_composite(sprite.image, (sprite.x + 128, sprite.y + 64))
+        stage.alpha_composite(sprite.image, (sprite.pos[0] + 128, sprite.pos[1] + 64))
 
     matrix.SetImage(
         stage.crop((128, 64, 128 * 2, 64 * 2)).resize((256, 128)).convert("RGB")
