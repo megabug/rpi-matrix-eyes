@@ -7,7 +7,7 @@ import math
 import random
 import time
 
-import PIL
+import PIL.Image
 import rgbmatrix
 
 from data.werewolf.data import EYE_DATA
