@@ -1,0 +1,19 @@
+{
+  "eye_image": "skull-eyes.bmp",
+  "upper_lid_image": "skull-upper-lids.bmp",
+  "lower_lid_image": "skull-lower-lids.bmp",
+  "stencil_image": "skull-stencil.bmp",
+
+  "transparent": [255, 0, 0],
+
+  "eye_move_min": [1, -4],
+  "eye_move_max": [11, 5],
+
+  "upper_lid_open": [11, -6],
+  "upper_lid_center": [11, -3],
+  "upper_lid_closed": [11, 5],
+
+  "lower_lid_open": [11, 17],
+  "lower_lid_center": [11, 16],
+  "lower_lid_closed": [11, 13]
+}

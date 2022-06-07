@@ -3,49 +3,16 @@
 # SPDX-FileCopyrightText: 2020 Phillip Burgess for Adafruit Industries, ported 2022 by mattd
 # SPDX-License-Identifier: MIT
 
+import argparse
+import json
 import math
+import os
+import os.path
 import random
 import time
 
 import PIL.Image
 import rgbmatrix
-
-from data.werewolf_2x.data import EYE_DATA
-
-# from data.werewolf.data import EYE_DATA
-# from data.cyclops.data import EYE_DATA
-# from data.kobold.data import EYE_DATA
-# from data.adabot.data import EYE_DATA
-# from data.skull.data import EYE_DATA
-
-
-# Pixel coords of eye image when centered ('neutral' position)
-EYE_CENTER = (
-    (EYE_DATA["eye_move_min"][0] + EYE_DATA["eye_move_max"][0]) / 2,
-    (EYE_DATA["eye_move_min"][1] + EYE_DATA["eye_move_max"][1]) / 2,
-)
-# Max eye image motion delta from center
-EYE_RANGE = (
-    abs(EYE_DATA["eye_move_max"][0] - EYE_DATA["eye_move_min"][0]) / 2,
-    abs(EYE_DATA["eye_move_max"][1] - EYE_DATA["eye_move_min"][1]) / 2,
-)
-# Motion bounds of upper and lower eyelids
-UPPER_LID_MIN = (
-    min(EYE_DATA["upper_lid_open"][0], EYE_DATA["upper_lid_closed"][0]),
-    min(EYE_DATA["upper_lid_open"][1], EYE_DATA["upper_lid_closed"][1]),
-)
-UPPER_LID_MAX = (
-    max(EYE_DATA["upper_lid_open"][0], EYE_DATA["upper_lid_closed"][0]),
-    max(EYE_DATA["upper_lid_open"][1], EYE_DATA["upper_lid_closed"][1]),
-)
-LOWER_LID_MIN = (
-    min(EYE_DATA["lower_lid_open"][0], EYE_DATA["lower_lid_closed"][0]),
-    min(EYE_DATA["lower_lid_open"][1], EYE_DATA["lower_lid_closed"][1]),
-)
-LOWER_LID_MAX = (
-    max(EYE_DATA["lower_lid_open"][0], EYE_DATA["lower_lid_closed"][0]),
-    max(EYE_DATA["lower_lid_open"][1], EYE_DATA["lower_lid_closed"][1]),
-)
 
 
 class Sprite:
@@ -55,7 +22,7 @@ class Sprite:
         if transparent is not None:
             for y in range(self.image.size[1]):
                 for x in range(self.image.size[0]):
-                    if self.image.getpixel((x, y))[:3] == transparent:
+                    if self.image.getpixel((x, y))[:3] == tuple(transparent):
                         self.image.putpixel((x, y), (0, 0, 0, 0))
 
         self.pos: tuple[int, int] = (0, 0)
@@ -68,14 +35,62 @@ options.chain_length = 2
 options.gpio_slowdown = 4
 matrix = rgbmatrix.RGBMatrix(options=options)
 
-stage = PIL.Image.new("RGBA", (matrix.width * 2, matrix.height * 2))
+parser = argparse.ArgumentParser()
+parser.add_argument("eyes", choices=os.listdir("data"))
+args = parser.parse_args()
+
+eye_data = json.load(open(os.path.join("data", args.eyes, "data.json")))
 
 sprites = [
-    Sprite(EYE_DATA["eye_image"]),
-    Sprite(EYE_DATA["lower_lid_image"], EYE_DATA.get("transparent")),
-    Sprite(EYE_DATA["upper_lid_image"], EYE_DATA.get("transparent")),
-    Sprite(EYE_DATA["stencil_image"], EYE_DATA.get("transparent")),
+    Sprite(os.path.join("data", args.eyes, eye_data["eye_image"])),
+    Sprite(
+        os.path.join("data", args.eyes, eye_data["lower_lid_image"]),
+        eye_data.get("transparent"),
+    ),
+    Sprite(
+        os.path.join("data", args.eyes, eye_data["upper_lid_image"]),
+        eye_data.get("transparent"),
+    ),
+    Sprite(
+        os.path.join("data", args.eyes, eye_data["stencil_image"]),
+        eye_data.get("transparent"),
+    ),
 ]
+
+offset = (sprites[3].image.size[0], sprites[3].image.size[1])
+
+stage = PIL.Image.new(
+    "RGBA",
+    (sprites[3].image.size[0] + offset[0], sprites[3].image.size[1] + offset[1]),
+)
+
+# Pixel coords of eye image when centered ('neutral' position)
+eye_center = (
+    (eye_data["eye_move_min"][0] + eye_data["eye_move_max"][0]) / 2,
+    (eye_data["eye_move_min"][1] + eye_data["eye_move_max"][1]) / 2,
+)
+# Max eye image motion delta from center
+eye_range = (
+    abs(eye_data["eye_move_max"][0] - eye_data["eye_move_min"][0]) / 2,
+    abs(eye_data["eye_move_max"][1] - eye_data["eye_move_min"][1]) / 2,
+)
+# Motion bounds of upper and lower eyelids
+upper_lid_min = (
+    min(eye_data["upper_lid_open"][0], eye_data["upper_lid_closed"][0]),
+    min(eye_data["upper_lid_open"][1], eye_data["upper_lid_closed"][1]),
+)
+upper_lid_max = (
+    max(eye_data["upper_lid_open"][0], eye_data["upper_lid_closed"][0]),
+    max(eye_data["upper_lid_open"][1], eye_data["upper_lid_closed"][1]),
+)
+lower_lid_min = (
+    min(eye_data["lower_lid_open"][0], eye_data["lower_lid_closed"][0]),
+    min(eye_data["lower_lid_open"][1], eye_data["lower_lid_closed"][1]),
+)
+lower_lid_max = (
+    max(eye_data["lower_lid_open"][0], eye_data["lower_lid_closed"][0]),
+    max(eye_data["lower_lid_open"][1], eye_data["lower_lid_closed"][1]),
+)
 
 eye_prev = (0, 0)
 eye_next = (0, 0)
@@ -98,8 +113,8 @@ while True:
             angle = random.uniform(0, math.pi * 2)
             # (0,0) in center, NOT pixel coords
             eye_next = (
-                math.cos(angle) * EYE_RANGE[0],
-                math.sin(angle) * EYE_RANGE[1],
+                math.cos(angle) * eye_range[0],
+                math.sin(angle) * eye_range[1],
             )
         else:  # Starting a new pause
             move_event_duration = random.uniform(0.04, 3)  # Hold time
@@ -138,37 +153,37 @@ while True:
 
     # Initial estimate of 'tracked' eyelid positions
     upper_lid_pos = (
-        EYE_DATA["upper_lid_center"][0] + eye_pos[0],
-        EYE_DATA["upper_lid_center"][1] + eye_pos[1],
+        eye_data["upper_lid_center"][0] + eye_pos[0],
+        eye_data["upper_lid_center"][1] + eye_pos[1],
     )
     lower_lid_pos = (
-        EYE_DATA["lower_lid_center"][0] + eye_pos[0],
-        EYE_DATA["lower_lid_center"][1] + eye_pos[1],
+        eye_data["lower_lid_center"][0] + eye_pos[0],
+        eye_data["lower_lid_center"][1] + eye_pos[1],
     )
     # Then constrain these to the upper/lower lid motion bounds
     upper_lid_pos = (
-        min(max(upper_lid_pos[0], UPPER_LID_MIN[0]), UPPER_LID_MAX[0]),
-        min(max(upper_lid_pos[1], UPPER_LID_MIN[1]), UPPER_LID_MAX[1]),
+        min(max(upper_lid_pos[0], upper_lid_min[0]), upper_lid_max[0]),
+        min(max(upper_lid_pos[1], upper_lid_min[1]), upper_lid_max[1]),
     )
     lower_lid_pos = (
-        min(max(lower_lid_pos[0], LOWER_LID_MIN[0]), LOWER_LID_MAX[0]),
-        min(max(lower_lid_pos[1], LOWER_LID_MIN[1]), LOWER_LID_MAX[1]),
+        min(max(lower_lid_pos[0], lower_lid_min[0]), lower_lid_max[0]),
+        min(max(lower_lid_pos[1], lower_lid_min[1]), lower_lid_max[1]),
     )
     # Then interpolate between bounded tracked position to closed position
     upper_lid_pos = (
-        upper_lid_pos[0] + ratio * (EYE_DATA["upper_lid_closed"][0] - upper_lid_pos[0]),
-        upper_lid_pos[1] + ratio * (EYE_DATA["upper_lid_closed"][1] - upper_lid_pos[1]),
+        upper_lid_pos[0] + ratio * (eye_data["upper_lid_closed"][0] - upper_lid_pos[0]),
+        upper_lid_pos[1] + ratio * (eye_data["upper_lid_closed"][1] - upper_lid_pos[1]),
     )
     lower_lid_pos = (
-        lower_lid_pos[0] + ratio * (EYE_DATA["lower_lid_closed"][0] - lower_lid_pos[0]),
-        lower_lid_pos[1] + ratio * (EYE_DATA["lower_lid_closed"][1] - lower_lid_pos[1]),
+        lower_lid_pos[0] + ratio * (eye_data["lower_lid_closed"][0] - lower_lid_pos[0]),
+        lower_lid_pos[1] + ratio * (eye_data["lower_lid_closed"][1] - lower_lid_pos[1]),
     )
 
     # Move eye sprites -----------------------------------------------------
 
     sprites[0].pos = (
-        int(EYE_CENTER[0] + eye_pos[0] + 0.5),
-        int(EYE_CENTER[1] + eye_pos[1] + 0.5),
+        int(eye_center[0] + eye_pos[0] + 0.5),
+        int(eye_center[1] + eye_pos[1] + 0.5),
     )
     sprites[2].pos = (
         int(upper_lid_pos[0] + 0.5),
@@ -184,11 +199,11 @@ while True:
     for sprite in sprites:
         stage.alpha_composite(
             sprite.image,
-            (sprite.pos[0] + stage.size[0] // 2, sprite.pos[1] + stage.size[1] // 2),
+            (sprite.pos[0] + offset[0], sprite.pos[1] + offset[1]),
         )
 
     matrix.SetImage(
-        stage.crop((stage.size[0] // 2, stage.size[1] // 2) + stage.size)
+        stage.crop(offset + stage.size)
         .resize((matrix.width, matrix.height))
         .convert("RGB")
     )

@@ -1,0 +1,19 @@
+{
+  "eye_image": "kobold-eyes.bmp",
+  "upper_lid_image": "kobold-upper-lids.bmp",
+  "lower_lid_image": "kobold-lower-lids.bmp",
+  "stencil_image": "kobold-stencil.bmp",
+
+  "transparent": [255, 0, 0],
+
+  "eye_move_min": [-10, -9],
+  "eye_move_max": [6, 6],
+
+  "upper_lid_open": [6, -7],
+  "upper_lid_center": [6, -4],
+  "upper_lid_closed": [6, 6],
+
+  "lower_lid_open": [6, 25],
+  "lower_lid_center": [6, 23],
+  "lower_lid_closed": [6, 15]
+}

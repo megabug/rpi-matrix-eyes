@@ -1,0 +1,19 @@
+{
+  "eye_image": "werewolf-eyes.bmp",
+  "upper_lid_image": "werewolf-upper-lids.bmp",
+  "lower_lid_image": "werewolf-lower-lids.bmp",
+  "stencil_image": "werewolf-stencil.bmp",
+
+  "transparent": [0, 255, 0],
+
+  "eye_move_min": [-3, -5],
+  "eye_move_max": [7, 6],
+
+  "upper_lid_open": [7, -4],
+  "upper_lid_center": [7, -1],
+  "upper_lid_closed": [7, 8],
+
+  "lower_lid_open": [7, 22],
+  "lower_lid_center": [7, 21],
+  "lower_lid_closed": [7, 17]
+}

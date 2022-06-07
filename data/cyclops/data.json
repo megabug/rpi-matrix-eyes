@@ -1,0 +1,19 @@
+{
+  "eye_image": "cyclops-eye.bmp",
+  "upper_lid_image": "cyclops-upper-lid.bmp",
+  "lower_lid_image": "cyclops-lower-lid.bmp",
+  "stencil_image": "cyclops-stencil.bmp",
+
+  "transparent": [255, 0, 0],
+
+  "eye_move_min": [-4, -15],
+  "eye_move_max": [14, -2],
+
+  "upper_lid_open": [15, -23],
+  "upper_lid_center": [15, -18],
+  "upper_lid_closed": [15, 0],
+
+  "lower_lid_open": [15, 24],
+  "lower_lid_center": [15, 23],
+  "lower_lid_closed": [15, 17]
+}

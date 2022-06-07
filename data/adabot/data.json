@@ -1,0 +1,19 @@
+{
+  "eye_image": "adabot-eyes.bmp",
+  "upper_lid_image": "adabot-upper-lids.bmp",
+  "lower_lid_image": "adabot-lower-lids.bmp",
+  "stencil_image": "adabot-stencil.bmp",
+
+  "transparent": [255, 0, 0],
+
+  "eye_move_min": [5, -1],
+  "eye_move_max": [13, 7],
+
+  "upper_lid_open": [13, -5],
+  "upper_lid_center": [13, -5],
+  "upper_lid_closed": [13, 7],
+
+  "lower_lid_open": [13, 22],
+  "lower_lid_center": [13, 22],
+  "lower_lid_closed": [13, 15]
+}
