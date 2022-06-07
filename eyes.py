@@ -35,24 +35,26 @@ options.chain_length = 2
 options.gpio_slowdown = 4
 matrix = rgbmatrix.RGBMatrix(options=options)
 
+data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+
 parser = argparse.ArgumentParser()
-parser.add_argument("eyes", choices=os.listdir("data"))
+parser.add_argument("eyes", choices=os.listdir(data_dir))
 args = parser.parse_args()
 
-eye_data = json.load(open(os.path.join("data", args.eyes, "data.json")))
+eye_data = json.load(open(os.path.join(data_dir, args.eyes, "data.json")))
 
 sprites = [
-    Sprite(os.path.join("data", args.eyes, eye_data["eye_image"])),
+    Sprite(os.path.join(data_dir, args.eyes, eye_data["eye_image"])),
     Sprite(
-        os.path.join("data", args.eyes, eye_data["lower_lid_image"]),
+        os.path.join(data_dir, args.eyes, eye_data["lower_lid_image"]),
         eye_data.get("transparent"),
     ),
     Sprite(
-        os.path.join("data", args.eyes, eye_data["upper_lid_image"]),
+        os.path.join(data_dir, args.eyes, eye_data["upper_lid_image"]),
         eye_data.get("transparent"),
     ),
     Sprite(
-        os.path.join("data", args.eyes, eye_data["stencil_image"]),
+        os.path.join(data_dir, args.eyes, eye_data["stencil_image"]),
         eye_data.get("transparent"),
     ),
 ]
