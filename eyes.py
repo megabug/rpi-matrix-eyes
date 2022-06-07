@@ -10,8 +10,9 @@ import time
 import PIL.Image
 import rgbmatrix
 
-from data.werewolf.data import EYE_DATA
+from data.werewolf_2x.data import EYE_DATA
 
+# from data.werewolf.data import EYE_DATA
 # from data.cyclops.data import EYE_DATA
 # from data.kobold.data import EYE_DATA
 # from data.adabot.data import EYE_DATA
@@ -71,9 +72,9 @@ stage = PIL.Image.new("RGBA", (128 * 2, 64 * 2))
 
 sprites = [
     Sprite(EYE_DATA["eye_image"]),
-    Sprite(EYE_DATA["lower_lid_image"], EYE_DATA["transparent"]),
-    Sprite(EYE_DATA["upper_lid_image"], EYE_DATA["transparent"]),
-    Sprite(EYE_DATA["stencil_image"], EYE_DATA["transparent"]),
+    Sprite(EYE_DATA["lower_lid_image"], EYE_DATA.get("transparent")),
+    Sprite(EYE_DATA["upper_lid_image"], EYE_DATA.get("transparent")),
+    Sprite(EYE_DATA["stencil_image"], EYE_DATA.get("transparent")),
 ]
 
 eye_prev = (0, 0)
@@ -183,6 +184,4 @@ while True:
     for sprite in sprites:
         stage.alpha_composite(sprite.image, (sprite.pos[0] + 128, sprite.pos[1] + 64))
 
-    matrix.SetImage(
-        stage.crop((128, 64, 128 * 2, 64 * 2)).resize((256, 128)).convert("RGB")
-    )
+    matrix.SetImage(stage.crop((128, 64, 128 * 2, 64 * 2)).convert("RGB"))
