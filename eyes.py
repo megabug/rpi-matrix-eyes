@@ -204,6 +204,6 @@ while True:
 
     matrix.SetImage(
         stage.crop(offset + stage.size)
-        .resize((matrix.width, matrix.height))
+        .resize((matrix.width, matrix.height), PIL.Image.NEAREST)
         .convert("RGB")
     )
