@@ -1,4 +1,0 @@
-{
-  "coc.preferences.formatOnSaveFiletypes": ["python"],
-  "python.formatting.provider": "black"
-}
