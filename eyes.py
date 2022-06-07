@@ -68,7 +68,7 @@ options.chain_length = 2
 options.gpio_slowdown = 4
 matrix = rgbmatrix.RGBMatrix(options=options)
 
-stage = PIL.Image.new("RGBA", (128 * 2, 64 * 2))
+stage = PIL.Image.new("RGBA", (matrix.width * 2, matrix.height * 2))
 
 sprites = [
     Sprite(EYE_DATA["eye_image"]),
@@ -182,6 +182,13 @@ while True:
     # Render ---------------------------------------------------------------
 
     for sprite in sprites:
-        stage.alpha_composite(sprite.image, (sprite.pos[0] + 128, sprite.pos[1] + 64))
+        stage.alpha_composite(
+            sprite.image,
+            (sprite.pos[0] + stage.size[0] // 2, sprite.pos[1] + stage.size[1] // 2),
+        )
 
-    matrix.SetImage(stage.crop((128, 64, 128 * 2, 64 * 2)).convert("RGB"))
+    matrix.SetImage(
+        stage.crop((stage.size[0] // 2, stage.size[1] // 2) + stage.size)
+        .resize((matrix.width, matrix.height))
+        .convert("RGB")
+    )
